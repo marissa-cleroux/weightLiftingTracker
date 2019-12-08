@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".AddExercise"
-    tools:showIn="@layout/activity_add_exercise">
+    tools:context=".EditExercise"
+    tools:showIn="@layout/activity_edit_exercise">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -136,5 +136,6 @@
             android:textAlignment="center" />
 
     </LinearLayout>
+
 
 </androidx.core.widget.NestedScrollView>

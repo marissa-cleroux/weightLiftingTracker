@@ -1,8 +1,12 @@
 package com.example.mcb51a04;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
 
 public class DbHandler extends SQLiteOpenHelper {
 
@@ -32,8 +36,8 @@ public class DbHandler extends SQLiteOpenHelper {
     private static final String EXERCISE_HISTORY_COLUMN_SETS = "sets";
     private static final String EXERCISE_HISTORY_COLUMN_REPS = "reps";
     private static final String EXERCISE_HISTORY_COLUMN_WEIGHT = "weight";
-    private static final String EXERCISE_HISTORY_COLUMN_TARGET_SETS = "sets";
-    private static final String EXERCISE_HISTORY_COLUMN_TARGET_REPS = "reps";
+    private static final String EXERCISE_HISTORY_COLUMN_TARGET_SETS = "target_sets";
+    private static final String EXERCISE_HISTORY_COLUMN_TARGET_REPS = "target_reps";
     private static final String EXERCISE_HISTORY_COLUMN_DATE = "date_completed";
 
     public DbHandler(Context context) {
@@ -59,6 +63,8 @@ public class DbHandler extends SQLiteOpenHelper {
         db.execSQL(
                 "create table " + PLANNED_WORKOUT_TABLE_NAME +
                         " (" + PLANNED_WORKOUT_COLUMN_ID + " integer primary key, " +
+                        PLANNED_WORKOUT_COLUMN_WORKOUT_ID + " integer, " +
+                        PLANNED_WORKOUT_COLUMN_EXERCISE_ID + " integer, " +
                         " foreign key  (" + PLANNED_WORKOUT_COLUMN_WORKOUT_ID + ") REFERENCES " +
                         WORKOUTS_TABLE_NAME + " (" + WORKOUTS_COLUMN_ID + ") ON DELETE CASCADE ON UPDATE CASCADE, " +
                         " foreign key (" + PLANNED_WORKOUT_COLUMN_EXERCISE_ID + ") REFERENCES " +
@@ -73,6 +79,7 @@ public class DbHandler extends SQLiteOpenHelper {
                         EXERCISE_HISTORY_COLUMN_TARGET_SETS + " double, " +
                         EXERCISE_HISTORY_COLUMN_TARGET_REPS + " double, " +
                         EXERCISE_HISTORY_COLUMN_DATE + " date, " +
+                        EXERCISE_HISTORY_EXERCISE_COLUMN_ID + " integer, " +
                         " foreign key (" + EXERCISE_HISTORY_EXERCISE_COLUMN_ID + ") REFERENCES " +
                         EXERCISES_TABLE_NAME + " (" + EXERCISES_COLUMN_ID + ") ON DELETE CASCADE ON UPDATE CASCADE)");
     }
@@ -80,5 +87,69 @@ public class DbHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
 
+        db.execSQL("DROP TABLE IF EXISTS " + PLANNED_WORKOUT_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + WORKOUTS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + EXERCISE_HISTORY_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + EXERCISES_TABLE_NAME);
+
+        onCreate(db);
+    }
+
+    public ArrayList<Exercise> getAllExercises() {
+        ArrayList<Exercise> exercises = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + EXERCISES_TABLE_NAME, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            int id = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_ID));
+            String name = res.getString(res.getColumnIndex(EXERCISES_COLUMN_NAME));
+            int sets = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_SETS));
+            int reps = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_REPS));
+            double weight = res.getDouble(res.getColumnIndex(EXERCISES_COLUMN_WEIGHT));
+            double increment = res.getDouble(res.getColumnIndex(EXERCISES_COLUMN_INCREMENT));
+
+            Exercise exercise = new Exercise(id, name, sets, reps, weight, increment);
+            exercises.add(exercise);
+            res.moveToNext();
+        }
+        res.close();
+
+        exercises.sort(new NameComparator());
+        return exercises;
+    }
+
+    public long addNewExercise (double increment, String name, int sets, int reps, double weight)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(EXERCISES_COLUMN_INCREMENT, increment);
+        contentValues.put(EXERCISES_COLUMN_NAME, name);
+        contentValues.put(EXERCISES_COLUMN_SETS, sets);
+        contentValues.put(EXERCISES_COLUMN_REPS, reps);
+        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+
+        return db.insert(EXERCISES_TABLE_NAME, null, contentValues);
+    }
+
+    public long updateExercise (int id, double increment, String name, int sets, int reps, double weight)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(EXERCISES_COLUMN_INCREMENT, increment);
+        contentValues.put(EXERCISES_COLUMN_NAME, name);
+        contentValues.put(EXERCISES_COLUMN_SETS, sets);
+        contentValues.put(EXERCISES_COLUMN_REPS, reps);
+        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+
+        return db.update(EXERCISES_TABLE_NAME, contentValues, EXERCISES_COLUMN_ID + " = ?",  new String[] { Integer.toString(id) } );
+    }
+
+    public boolean deleteExercise (int id)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(EXERCISES_TABLE_NAME, EXERCISES_COLUMN_ID + " = ?", new String[]{Integer.toString(id)});
+        return true;
     }
 }

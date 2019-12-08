@@ -12,11 +12,11 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-public class AddExercise extends AppCompatActivity {
+public class EditExercise extends AppCompatActivity {
 
+    private Exercise exercise;
     private EditText edtName;
     private EditText edtReps;
     private EditText edtSets;
@@ -26,8 +26,8 @@ public class AddExercise extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_exercise);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_edit_exercise);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         edtName = findViewById(R.id.edtExercise);
@@ -36,26 +36,31 @@ public class AddExercise extends AppCompatActivity {
         edtWeight = findViewById(R.id.edtStWeight);
         edtIncrement = findViewById(R.id.edtWeightIncrement);
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            exercise = (Exercise) intent.getSerializableExtra("exercise");
+            exercise.setName(intent.getStringExtra("name"));
+            setFields();
+        }
+
         Button btnSave = findViewById(R.id.btnSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(addNewExercise()){
-                    ToastMessage("Exercise successfully added!");
-                    ReturnToMainMenu();
-                }else {
-                    ToastMessage("Exercise was not added, review the details and try again.");
-                }
+                editExercise();
             }
         });
     }
 
-    private void ReturnToMainMenu() {
-        Intent i = new Intent(this, ManageExercises.class);
-        startActivity(i);
+    private void setFields() {
+        edtName.setText(exercise.getName());
+        edtReps.setText(Integer.toString(exercise.getReps()));
+        edtSets.setText(Integer.toString(exercise.getSets()));
+        edtWeight.setText(Double.toString(exercise.getWeight()));
+        edtIncrement.setText(Double.toString(exercise.getIncrement()));
     }
 
-    private boolean addNewExercise() {
+    private void editExercise() {
         String name = edtName.getText().toString();
         int reps = Integer.parseInt(edtReps.getText().toString());
         int set = Integer.parseInt(edtSets.getText().toString());
@@ -63,14 +68,18 @@ public class AddExercise extends AppCompatActivity {
         double increment = Double.parseDouble(edtIncrement.getText().toString());
 
         DbHandler db = new DbHandler(this);
-        long id = db.addNewExercise(increment, name, set, reps, weight);
+        db.updateExercise(exercise.getId(), increment, name, set, reps, weight);
+        db.close();
+        ToastMessage("Exercise was updated!");
+        ReturnToMainMenu();
+    }
 
-        return id != -1;
+    private void ReturnToMainMenu() {
+        Intent i = new Intent(this, ManageExercises.class);
+        startActivity(i);
     }
 
     private void ToastMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
-
-
 }

@@ -8,6 +8,20 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="PrimaryButton">
+
+    </style>
+
+    <style name="MenuButton">
+
+    </style>
+
+    <style name="HeaderTheme">
+        <item name="android:textColor">@color/dark</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">30sp</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
