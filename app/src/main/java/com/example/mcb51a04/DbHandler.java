@@ -101,14 +101,7 @@ public class DbHandler extends SQLiteOpenHelper {
         Cursor res = db.rawQuery("select * from " + EXERCISES_TABLE_NAME, null);
         res.moveToFirst();
         while (!res.isAfterLast()) {
-            int id = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_ID));
-            String name = res.getString(res.getColumnIndex(EXERCISES_COLUMN_NAME));
-            int sets = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_SETS));
-            int reps = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_REPS));
-            double weight = res.getDouble(res.getColumnIndex(EXERCISES_COLUMN_WEIGHT));
-            double increment = res.getDouble(res.getColumnIndex(EXERCISES_COLUMN_INCREMENT));
-
-            Exercise exercise = new Exercise(id, name, sets, reps, weight, increment);
+            Exercise exercise = mapExercise(res);
             exercises.add(exercise);
             res.moveToNext();
         }
@@ -116,6 +109,17 @@ public class DbHandler extends SQLiteOpenHelper {
 
         exercises.sort(new NameComparator());
         return exercises;
+    }
+
+    private Exercise mapExercise(Cursor res) {
+        int id = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_ID));
+        String name = res.getString(res.getColumnIndex(EXERCISES_COLUMN_NAME));
+        int sets = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_SETS));
+        int reps = res.getInt(res.getColumnIndex(EXERCISES_COLUMN_REPS));
+        double weight = res.getDouble(res.getColumnIndex(EXERCISES_COLUMN_WEIGHT));
+        double increment = res.getDouble(res.getColumnIndex(EXERCISES_COLUMN_INCREMENT));
+
+        return new Exercise(id, name, sets, reps, weight, increment);
     }
 
     public long addNewExercise (double increment, String name, int sets, int reps, double weight)
@@ -147,6 +151,78 @@ public class DbHandler extends SQLiteOpenHelper {
     }
 
     public boolean deleteExercise (int id)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(EXERCISES_TABLE_NAME, EXERCISES_COLUMN_ID + " = ?", new String[]{Integer.toString(id)});
+        return true;
+    }
+
+    public ArrayList<Workout> getAllWorkouts() {
+        ArrayList<Workout> workouts = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + WORKOUTS_TABLE_NAME, null);
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            int id = res.getInt(res.getColumnIndex(WORKOUTS_COLUMN_ID));
+            String name = res.getString(res.getColumnIndex(WORKOUTS_COLUMN_NAME));
+
+            Workout workout = new Workout(id, name);
+            workout.setExercise(getAllExercisesInAWorkout(workout.getId()));
+            workouts.add(workout);
+            res.moveToNext();
+        }
+        res.close();
+
+        workouts.sort(new NameComparator());
+        return workouts;
+    }
+
+    public ArrayList<Exercise> getAllExercisesInAWorkout(int id){
+        ArrayList<Exercise> exercises = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + EXERCISES_TABLE_NAME +
+                " as e join " + PLANNED_WORKOUT_TABLE_NAME + " as pw on e." + EXERCISES_COLUMN_ID + "=  pw." + PLANNED_WORKOUT_COLUMN_EXERCISE_ID +
+                " where " + WORKOUTS_COLUMN_ID + "= ?", new String[]{Integer.toString(id)});
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            Exercise exercise = mapExercise(res);
+            exercises.add(exercise);
+            res.moveToNext();
+        }
+        res.close();
+
+        return exercises;
+    };
+
+    public long addNewWorkout (double increment, String name, int sets, int reps, double weight)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(EXERCISES_COLUMN_INCREMENT, increment);
+        contentValues.put(EXERCISES_COLUMN_NAME, name);
+        contentValues.put(EXERCISES_COLUMN_SETS, sets);
+        contentValues.put(EXERCISES_COLUMN_REPS, reps);
+        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+
+        return db.insert(EXERCISES_TABLE_NAME, null, contentValues);
+    }
+
+    public long updateWorkout (int id, double increment, String name, int sets, int reps, double weight)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(EXERCISES_COLUMN_INCREMENT, increment);
+        contentValues.put(EXERCISES_COLUMN_NAME, name);
+        contentValues.put(EXERCISES_COLUMN_SETS, sets);
+        contentValues.put(EXERCISES_COLUMN_REPS, reps);
+        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+
+        return db.update(EXERCISES_TABLE_NAME, contentValues, EXERCISES_COLUMN_ID + " = ?",  new String[] { Integer.toString(id) } );
+    }
+
+    public boolean deleteWorkout (int id)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(EXERCISES_TABLE_NAME, EXERCISES_COLUMN_ID + " = ?", new String[]{Integer.toString(id)});

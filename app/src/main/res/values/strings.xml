@@ -114,5 +114,11 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="edit_exercise">Edit Exercise</string>
+    <string name="title_activity_manage_workouts">ManageWorkouts</string>
+    <string name="manage_workouts">Manage Workouts</string>
+    <string name="add_new_workout">Add New Workout</string>
+    <string name="title_activity_add_workout">AddWorkout</string>
+    <string name="workout_name">Workout Name</string>
+    <string name="plus">+</string>
 
 </resources>
