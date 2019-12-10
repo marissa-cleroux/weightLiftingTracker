@@ -9,6 +9,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ManageExercises extends AppCompatActivity {
 
@@ -30,7 +32,7 @@ public class ManageExercises extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_exercises);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ddEdits = findViewById(R.id.ddEditExercise);
@@ -97,6 +99,13 @@ public class ManageExercises extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
     private void deleteExercise() {
         //TODO: Add popup
         if (exerciseToDelete == null) {
@@ -139,6 +148,7 @@ public class ManageExercises extends AppCompatActivity {
         for (Exercise ex : exercises) {
             exerciseDescriptions.add(ex.getName());
         }
+
         return exerciseDescriptions;
     }
 

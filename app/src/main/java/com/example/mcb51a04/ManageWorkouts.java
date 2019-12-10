@@ -1,5 +1,6 @@
 package com.example.mcb51a04;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -8,11 +9,13 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -36,7 +39,7 @@ public class ManageWorkouts extends AppCompatActivity {
 
         loadSpinners();
 
-        Button btnNew = findViewById(R.id.btnNewExercise);
+        Button btnNew = findViewById(R.id.btnNewWorkout);
         btnNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,7 +47,7 @@ public class ManageWorkouts extends AppCompatActivity {
             }
         });
 
-        Button btnEdit = findViewById(R.id.btnEditExercise);
+        Button btnEdit = findViewById(R.id.btnEditWorkout);
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,7 +55,7 @@ public class ManageWorkouts extends AppCompatActivity {
             }
         });
 
-        Button btnDelete = findViewById(R.id.btnDeleteExercise);
+        Button btnDelete = findViewById(R.id.btnDeleteWorkout);
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,12 +99,37 @@ public class ManageWorkouts extends AppCompatActivity {
     }
 
     private void deleteWorkout() {
+        if (workoutToDelete == null) {
+            ToastMessage("You must select an exercise to delete!");
+            return;
+        }
+
+        DbHandler db = new DbHandler(this);
+        if(db.deleteWorkout(workoutToDelete.getId())){
+            db.close();
+            ToastMessage(workoutToDelete.getName() + " was deleted!");
+            loadSpinners();
+            workoutToDelete = null;
+            workoutToEdit = null;
+        } else {
+            ToastMessage(workoutToDelete.getName() + " could not be deleted!");
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     private void sendToEditWorkout() {
     }
 
     private void sendToAddWorkout() {
+        Intent i = new Intent(this, AddWorkout.class);
+        startActivity(i);
     }
 
     private void loadSpinners() {
@@ -126,4 +154,8 @@ public class ManageWorkouts extends AppCompatActivity {
         
         return workoutDescriptions;
     }
+    private void ToastMessage(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
 }

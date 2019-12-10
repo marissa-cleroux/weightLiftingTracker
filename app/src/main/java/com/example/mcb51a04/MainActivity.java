@@ -39,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
                 sendToManageExercises();
             }
         });
+
+        Button btnMngWorkouts = findViewById(R.id.btnMngWorkouts);
+        btnMngWorkouts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendToManageWorkouts();
+            }
+        });
     }
 
     @Override
@@ -61,14 +69,13 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.action_help) {
 //            displayAllEmployees();
         } else if (id == R.id.action_exercises) {
-//            Intent i = new Intent(this, UseInformation.class);
-//            startActivity(i);
+            sendToManageExercises();
         } else if (id == R.id.action_history) {
 
         } else if (id == R.id.action_workout) {
 
         } else if (id == R.id.action_workouts) {
-
+            sendToManageWorkouts();
         }
 
         return super.onOptionsItemSelected(item);
@@ -76,6 +83,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendToManageExercises(){
         Intent i = new Intent(this, ManageExercises.class);
+        startActivity(i);
+    }
+
+    public void sendToManageWorkouts() {
+        Intent i = new Intent(this, ManageWorkouts.class);
         startActivity(i);
     }
 

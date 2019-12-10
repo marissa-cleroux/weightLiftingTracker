@@ -181,8 +181,8 @@ public class DbHandler extends SQLiteOpenHelper {
         ArrayList<Exercise> exercises = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from " + EXERCISES_TABLE_NAME +
-                " as e join " + PLANNED_WORKOUT_TABLE_NAME + " as pw on e." + EXERCISES_COLUMN_ID + "=  pw." + PLANNED_WORKOUT_COLUMN_EXERCISE_ID +
-                " where " + WORKOUTS_COLUMN_ID + "= ?", new String[]{Integer.toString(id)});
+                " as e join " + PLANNED_WORKOUT_TABLE_NAME + " as pw on e." + EXERCISES_COLUMN_ID + " =  pw." + PLANNED_WORKOUT_COLUMN_EXERCISE_ID +
+                " where pw." + WORKOUTS_COLUMN_ID + "= ?", new String[]{Integer.toString(id)});
         res.moveToFirst();
         while (!res.isAfterLast()) {
             Exercise exercise = mapExercise(res);
@@ -194,18 +194,22 @@ public class DbHandler extends SQLiteOpenHelper {
         return exercises;
     };
 
-    public long addNewWorkout (double increment, String name, int sets, int reps, double weight)
+    public long addNewWorkout (Workout workout)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(EXERCISES_COLUMN_INCREMENT, increment);
-        contentValues.put(EXERCISES_COLUMN_NAME, name);
-        contentValues.put(EXERCISES_COLUMN_SETS, sets);
-        contentValues.put(EXERCISES_COLUMN_REPS, reps);
-        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+        contentValues.put(WORKOUTS_COLUMN_NAME, workout.getName());
+        long res = db.insert(WORKOUTS_TABLE_NAME, null, contentValues);
 
-        return db.insert(EXERCISES_TABLE_NAME, null, contentValues);
+        for(Exercise ex : workout.getExercises()){
+            contentValues = new ContentValues();
+            contentValues.put(PLANNED_WORKOUT_COLUMN_EXERCISE_ID, ex.getId());
+            contentValues.put(PLANNED_WORKOUT_COLUMN_WORKOUT_ID, res);
+            db.insert(PLANNED_WORKOUT_TABLE_NAME, null, contentValues);
+        }
+
+        return res;
     }
 
     public long updateWorkout (int id, double increment, String name, int sets, int reps, double weight)
@@ -225,7 +229,7 @@ public class DbHandler extends SQLiteOpenHelper {
     public boolean deleteWorkout (int id)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(EXERCISES_TABLE_NAME, EXERCISES_COLUMN_ID + " = ?", new String[]{Integer.toString(id)});
-        return true;
+        long res = db.delete(WORKOUTS_TABLE_NAME, WORKOUTS_COLUMN_ID + " = ?", new String[]{Integer.toString(id)});
+        return res != -1;
     }
 }
