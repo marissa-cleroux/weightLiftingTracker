@@ -3,6 +3,9 @@ package com.example.mcb51a04;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -20,8 +23,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class AddWorkout extends AppCompatActivity {
-
+public class EditWorkout extends AppCompatActivity {
     private ArrayList<Exercise> exercises;
     private Exercise exerciseToAdd;
     private Spinner ddAddExercise;
@@ -34,13 +36,12 @@ public class AddWorkout extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_workout);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_edit_workout);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         exerciseList = findViewById(R.id.exerciseList);
         edtWorkout = findViewById(R.id.edtWorkout);
-        workout = new Workout();
 
         ddAddExercise = findViewById(R.id.ddAddExercise);
         ddAddExercise.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -64,11 +65,11 @@ public class AddWorkout extends AppCompatActivity {
         btnAddExercise.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(exerciseToAdd != null && !workout.getExercises().contains(exerciseToAdd)){
+                if (exerciseToAdd != null && !workout.containsExercise(exerciseToAdd)) {
                     workout.addExercise(exerciseToAdd);
                     exerciseToAdd = null;
                     updateList();
-                } else if(exerciseToAdd == null){
+                } else if (exerciseToAdd == null) {
                     ToastMessage("Please select an exercise to add.");
                 } else {
                     ToastMessage("That exercise has already been added to your workout.");
@@ -80,8 +81,9 @@ public class AddWorkout extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(workout.getExercises().size() != 0 ){
-                    if(saveWorkout()){
+                if (workout.getExercises().size() != 0) {
+                    if (updateWorkout()) {
+                        ToastMessage("Workout updates saved!");
                         sendToManageWorkouts();
                     } else {
                         ToastMessage("Workout could not be saved");
@@ -92,10 +94,20 @@ public class AddWorkout extends AppCompatActivity {
             }
         });
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            workout = (Workout) intent.getSerializableExtra("workout");
+            setFields();
+        }
+
         loadSpinner();
     }
 
-    @Override
+    public void setFields(){
+        edtWorkout.setText(workout.getName());
+        updateList();
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -107,12 +119,12 @@ public class AddWorkout extends AppCompatActivity {
         startActivity(i);
     }
 
-    private boolean saveWorkout() {
+    private boolean updateWorkout() {
         //TODO: Validate name is set
         workout.setName(edtWorkout.getText().toString());
 
         DbHandler db = new DbHandler(this);
-        long id = db.addNewWorkout(workout);
+        long id = db.updateWorkout(workout);
 
         return id != -1;
     }
@@ -152,7 +164,7 @@ public class AddWorkout extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    View.OnClickListener addRemoveExerciseListener(final LinearLayout ll)  {
+    View.OnClickListener addRemoveExerciseListener(final LinearLayout ll) {
         return new View.OnClickListener() {
             public void onClick(View v) {
                 workout.removeExercise(ll.getId());
@@ -167,9 +179,9 @@ public class AddWorkout extends AppCompatActivity {
         imgParams.setMargins(10, 0, 0, 0);
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0,15, 0, 15 );
+        layoutParams.setMargins(0, 15, 0, 15);
 
-        for(Exercise ex : workout.getExercises()){
+        for (Exercise ex : workout.getExercises()) {
             LinearLayout ll = new LinearLayout(this);
             ll.setOrientation(LinearLayout.HORIZONTAL);
             ll.setLayoutParams(layoutParams);

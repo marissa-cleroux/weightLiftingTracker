@@ -1,6 +1,8 @@
 package com.example.mcb51a04;
 
-public class NamedObject {
+import java.io.Serializable;
+
+public class NamedObject implements Serializable {
 
     private String name;
 

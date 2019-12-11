@@ -125,6 +125,14 @@ public class ManageWorkouts extends AppCompatActivity {
     }
 
     private void sendToEditWorkout() {
+        if(workoutToEdit == null) {
+            ToastMessage("You must select a workout to edit!");
+            return;
+        }
+
+        Intent i = new Intent(this, EditWorkout.class);
+        i.putExtra("workout", workoutToEdit);
+        startActivity(i);
     }
 
     private void sendToAddWorkout() {

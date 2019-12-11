@@ -5,8 +5,16 @@ import java.util.ArrayList;
 
 public class Workout extends NamedObject implements Serializable {
     private int id;
-    private String name;
     private ArrayList<Exercise> exercises;
+
+    public boolean containsExercise(Exercise exercise){
+        for(Exercise ex : exercises){
+            if(ex.equals(exercise))
+                return true;
+        }
+
+        return false;
+    }
 
     public void setExercise(ArrayList<Exercise> exercises) {
         this.exercises = exercises;

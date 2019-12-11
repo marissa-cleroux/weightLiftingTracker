@@ -68,4 +68,13 @@ public class Exercise extends NamedObject implements Serializable {
         this.increment = increment;
     }
 
+    @Override
+    public boolean equals(Object o){
+        if(!(o instanceof Exercise)){
+            return false;
+        }
+
+        return this.getId() == ((Exercise)o).getId();
+    }
+
 }

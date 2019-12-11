@@ -162,6 +162,7 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from " + WORKOUTS_TABLE_NAME, null);
         res.moveToFirst();
+
         while (!res.isAfterLast()) {
             int id = res.getInt(res.getColumnIndex(WORKOUTS_COLUMN_ID));
             String name = res.getString(res.getColumnIndex(WORKOUTS_COLUMN_NAME));
@@ -180,9 +181,13 @@ public class DbHandler extends SQLiteOpenHelper {
     public ArrayList<Exercise> getAllExercisesInAWorkout(int id){
         ArrayList<Exercise> exercises = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + EXERCISES_TABLE_NAME +
+        Cursor res = db.rawQuery("select e." + EXERCISES_COLUMN_ID +  ", e." + EXERCISES_COLUMN_NAME +
+                " , e." + EXERCISES_COLUMN_INCREMENT + ", e." + EXERCISES_COLUMN_REPS +
+                " , e." + EXERCISES_COLUMN_WEIGHT  + ", e." + EXERCISES_COLUMN_SETS +
+                " from " + EXERCISES_TABLE_NAME +
                 " as e join " + PLANNED_WORKOUT_TABLE_NAME + " as pw on e." + EXERCISES_COLUMN_ID + " =  pw." + PLANNED_WORKOUT_COLUMN_EXERCISE_ID +
-                " where pw." + WORKOUTS_COLUMN_ID + "= ?", new String[]{Integer.toString(id)});
+                " where pw." + PLANNED_WORKOUT_COLUMN_WORKOUT_ID + "= ?", new String[]{Integer.toString(id)});
+
         res.moveToFirst();
         while (!res.isAfterLast()) {
             Exercise exercise = mapExercise(res);
@@ -197,33 +202,50 @@ public class DbHandler extends SQLiteOpenHelper {
     public long addNewWorkout (Workout workout)
     {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues contentValues = new ContentValues();
-
         contentValues.put(WORKOUTS_COLUMN_NAME, workout.getName());
-        long res = db.insert(WORKOUTS_TABLE_NAME, null, contentValues);
 
-        for(Exercise ex : workout.getExercises()){
-            contentValues = new ContentValues();
-            contentValues.put(PLANNED_WORKOUT_COLUMN_EXERCISE_ID, ex.getId());
-            contentValues.put(PLANNED_WORKOUT_COLUMN_WORKOUT_ID, res);
-            db.insert(PLANNED_WORKOUT_TABLE_NAME, null, contentValues);
-        }
+        long workoutId = db.insert(WORKOUTS_TABLE_NAME, null, contentValues);
 
-        return res;
+        addExercisesForPlannedWorkout((int)workoutId, workout.getExercises());
+
+        return workoutId;
     }
 
-    public long updateWorkout (int id, double increment, String name, int sets, int reps, double weight)
+    private void addExercisesForPlannedWorkout(int workoutId, ArrayList<Exercise> exercises) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues;
+
+        for(Exercise ex : exercises){
+            contentValues = new ContentValues();
+            contentValues.put(PLANNED_WORKOUT_COLUMN_EXERCISE_ID, ex.getId());
+            contentValues.put(PLANNED_WORKOUT_COLUMN_WORKOUT_ID, workoutId);
+            db.insert(PLANNED_WORKOUT_TABLE_NAME, null, contentValues);
+        }
+    }
+
+    public long updateWorkout (Workout workout)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(EXERCISES_COLUMN_INCREMENT, increment);
-        contentValues.put(EXERCISES_COLUMN_NAME, name);
-        contentValues.put(EXERCISES_COLUMN_SETS, sets);
-        contentValues.put(EXERCISES_COLUMN_REPS, reps);
-        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+        contentValues.put(WORKOUTS_COLUMN_NAME, workout.getName());
+        long res = db.update(WORKOUTS_TABLE_NAME, contentValues, WORKOUTS_COLUMN_ID + " = ?",  new String[] { Integer.toString(workout.getId()) } );
+        updateExercisesInWorkout(workout);
 
-        return db.update(EXERCISES_TABLE_NAME, contentValues, EXERCISES_COLUMN_ID + " = ?",  new String[] { Integer.toString(id) } );
+        return res;
+    }
+
+    private void updateExercisesInWorkout(Workout workout){
+        removeExercisesInWorkout(workout);
+        addExercisesForPlannedWorkout(workout.getId(), workout.getExercises());
+    }
+
+
+    private long removeExercisesInWorkout(Workout workout) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(PLANNED_WORKOUT_TABLE_NAME, PLANNED_WORKOUT_COLUMN_WORKOUT_ID + " = ?", new String[]{Integer.toString(workout.getId())});
     }
 
     public boolean deleteWorkout (int id)
