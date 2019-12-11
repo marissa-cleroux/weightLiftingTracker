@@ -21,4 +21,8 @@ public class NamedObject implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    protected boolean validateName(){
+        return name.length() != 0;
+    }
 }

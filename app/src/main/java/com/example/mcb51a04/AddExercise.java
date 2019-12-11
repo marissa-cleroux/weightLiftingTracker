@@ -53,7 +53,6 @@ public class AddExercise extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -64,17 +63,56 @@ public class AddExercise extends AppCompatActivity {
     }
 
     private boolean addNewExercise() {
-        String name = edtName.getText().toString();
-        int reps = Integer.parseInt(edtReps.getText().toString());
-        int set = Integer.parseInt(edtSets.getText().toString());
-        double weight = Double.parseDouble(edtWeight.getText().toString());
-        double increment = Double.parseDouble(edtIncrement.getText().toString());
+        String name;
+        int reps;
+        int sets;
+        double weight;
+        double increment;
 
-        DbHandler db = new DbHandler(this);
-        long id = db.addNewExercise(increment, name, set, reps, weight);
+        try{
+            name = edtName.getText().toString();
+            reps = Integer.parseInt(edtReps.getText().toString());
+            sets = Integer.parseInt(edtSets.getText().toString());
+            weight = Double.parseDouble(edtWeight.getText().toString());
+            increment = Double.parseDouble(edtIncrement.getText().toString());
+        }catch(Exception e) {
+            return false;
+        }
 
-        return id != -1;
+        int valid = new Exercise(0, name, sets, reps, weight, increment).validateExercise();
+
+        if(valid == 0){
+            DbHandler db = new DbHandler(this);
+            long id = db.addNewExercise(increment, name, sets, reps, weight);
+
+            return id != -1;
+        }else {
+            ErrorMessage(valid);
+            return false;
+        }
+
     }
+
+    private void ErrorMessage(int valid) {
+        switch(valid){
+            case Exercise.InvalidIncrement:
+                ToastMessage("Increment must be greater than 0");
+                break;
+            case Exercise.InvalidName:
+                ToastMessage("Name must be set");
+                break;
+            case Exercise.InvalidReps:
+                ToastMessage("Reps must be greater than 0");
+                break;
+            case Exercise.InvalidSets:
+                ToastMessage("Sets must be greater than 0 and less than 6");
+                break;
+            case Exercise.InvalidWeight:
+                ToastMessage("Weights must be greater than 0");
+                break;
+        }
+    }
+
 
     private void ToastMessage(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();

@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        Button btnMngExercies = findViewById(R.id.btnMngExercises);
-        btnMngExercies.setOnClickListener(new View.OnClickListener() {
+        Button btnMngExercises = findViewById(R.id.btnMngExercises);
+        btnMngExercises.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sendToManageExercises();
@@ -47,6 +47,19 @@ public class MainActivity extends AppCompatActivity {
                 sendToManageWorkouts();
             }
         });
+
+        Button btnWorkout = findViewById(R.id.btnWorkout);
+        btnWorkout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendToWorkout();
+            }
+        });
+    }
+
+    private void sendToWorkout() {
+        Intent i = new Intent(this, PickWorkout.class);
+        startActivity(i);
     }
 
     @Override

@@ -77,4 +77,35 @@ public class Exercise extends NamedObject implements Serializable {
         return this.getId() == ((Exercise)o).getId();
     }
 
+    public static final int ValidExercise = 0;
+    public static final int InvalidName = -1;
+    public static final int InvalidSets = -2;
+    public static final int InvalidReps = -3;
+    public static final int InvalidIncrement = -4;
+    public static final int InvalidWeight = -5;
+
+    public int validateExercise(){
+        if(!super.validateName()){
+            return InvalidName;
+        }
+
+        if(sets > 5 || sets < 0){
+            return InvalidSets;
+        }
+
+        if(reps < 0){
+            return InvalidReps;
+        }
+
+        if(increment < 0){
+            return InvalidIncrement;
+        }
+
+        if(weight < 0){
+            return InvalidWeight;
+        }
+
+        return ValidExercise;
+    }
+
 }

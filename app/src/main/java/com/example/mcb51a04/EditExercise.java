@@ -9,6 +9,7 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -48,7 +49,12 @@ public class EditExercise extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editExercise();
+                if(editExercise()){
+                    ToastMessage("Exercise was updated!");
+                    ReturnToMainMenu();
+                }else {
+                    ToastMessage("Exercise could not be updated, please review your details and try again!");
+                }
             }
         });
     }
@@ -68,23 +74,60 @@ public class EditExercise extends AppCompatActivity {
         edtIncrement.setText(Double.toString(exercise.getIncrement()));
     }
 
-    private void editExercise() {
-        String name = edtName.getText().toString();
-        int reps = Integer.parseInt(edtReps.getText().toString());
-        int set = Integer.parseInt(edtSets.getText().toString());
-        double weight = Double.parseDouble(edtWeight.getText().toString());
-        double increment = Double.parseDouble(edtIncrement.getText().toString());
+    private boolean editExercise() {
+        String name;
+        int reps;
+        int sets;
+        double weight;
+        double increment;
 
-        DbHandler db = new DbHandler(this);
-        db.updateExercise(exercise.getId(), increment, name, set, reps, weight);
-        db.close();
-        ToastMessage("Exercise was updated!");
-        ReturnToMainMenu();
+        try{
+            name = edtName.getText().toString();
+            reps = Integer.parseInt(edtReps.getText().toString());
+            sets = Integer.parseInt(edtSets.getText().toString());
+            weight = Double.parseDouble(edtWeight.getText().toString());
+            increment = Double.parseDouble(edtIncrement.getText().toString());
+        }catch(Exception e) {
+            return false;
+        }
+
+        int valid = new Exercise(exercise.getId(), name, sets, reps, weight, increment).validateExercise();
+
+        if(valid == 0){
+            DbHandler db = new DbHandler(this);
+            long id = db.updateExercise(exercise.getId(), increment, name, sets, reps, weight);
+            db.close();
+
+            return id != -1;
+        }else {
+            ErrorMessage(valid);
+            return false;
+        }
     }
 
     private void ReturnToMainMenu() {
         Intent i = new Intent(this, ManageExercises.class);
         startActivity(i);
+    }
+
+    private void ErrorMessage(int invalidStatus) {
+        switch(invalidStatus){
+            case Exercise.InvalidIncrement:
+                ToastMessage("Increment must be greater than 0");
+                break;
+            case Exercise.InvalidName:
+                ToastMessage("Name must be set");
+                break;
+            case Exercise.InvalidReps:
+                ToastMessage("Reps must be greater than 0");
+                break;
+            case Exercise.InvalidSets:
+                ToastMessage("Sets must be greater than 0 and less than 6.");
+                break;
+            case Exercise.InvalidWeight:
+                ToastMessage("Weights must be greater than 0");
+                break;
+        }
     }
 
     private void ToastMessage(String msg) {

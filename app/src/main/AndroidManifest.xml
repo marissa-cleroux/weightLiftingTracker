@@ -10,9 +10,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".PerformWorkout"
+            android:label="@string/title_activity_perform_workout"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".PickWorkout"
+            android:label="@string/title_activity_pick_workout"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".EditWorkout"
             android:label="@string/title_activity_edit_workout"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddWorkout"
             android:label="@string/title_activity_add_workout"
