@@ -26,9 +26,6 @@
             android:label="@string/title_activity_add_exercise"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.login.AddExercise"
-            android:label="@string/title_activity_add_exercise" />
-        <activity
             android:name=".ManageExercises"
             android:label="@string/title_activity_manage_exercises"
             android:theme="@style/AppTheme.NoActionBar" />

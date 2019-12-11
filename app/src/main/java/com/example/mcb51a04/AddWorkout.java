@@ -2,9 +2,6 @@ package com.example.mcb51a04;
 
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -13,13 +10,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class AddWorkout extends AppCompatActivity {
 
@@ -31,7 +28,6 @@ public class AddWorkout extends AppCompatActivity {
     private Workout workout;
     private LinearLayout exerciseList;
     private TextView edtWorkout;
-    private HashMap<Integer, Exercise> exerciseDict = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +64,8 @@ public class AddWorkout extends AppCompatActivity {
             public void onClick(View view) {
                 if(exerciseToAdd != null && !workout.getExercises().contains(exerciseToAdd)){
                     workout.addExercise(exerciseToAdd);
-                    addExerciseToList(exerciseToAdd);
+                    exerciseToAdd = null;
+                    updateList();
                 } else if(exerciseToAdd == null){
                     ToastMessage("Please select an exercise to add.");
                 } else {
@@ -124,9 +121,6 @@ public class AddWorkout extends AppCompatActivity {
         tv.setId(exerciseToAdd.getId());
         tv.setOnClickListener(addRemoveExerciseListener(tv));
         exerciseList.addView(tv);
-        exerciseDict.put(tv.getId(), exerciseToAdd);
-
-        ToastMessage(exerciseToAdd.getId() + " added.");
         exerciseToAdd = null;
     }
 
@@ -158,18 +152,28 @@ public class AddWorkout extends AppCompatActivity {
     View.OnClickListener addRemoveExerciseListener(final TextView tv)  {
         return new View.OnClickListener() {
             public void onClick(View v) {
-                String exercise = tv.getText().toString();
                 workout.removeExercise(tv.getId());
-                ToastMessage(tv.getId() + " removed.");
                 updateList();
             }
         };
     }
 
     private void updateList() {
-        
+        exerciseList.removeAllViews();
+        for(Exercise ex : workout.getExercises()){
+            LinearLayout ll = new LinearLayout(this);
+            ll.setOrientation(LinearLayout.HORIZONTAL);
+            TextView tv = new TextView(this);
+            tv.setText(ex.getName() + " ( - )");
+            tv.setTextAppearance(R.style.TextTheme);
+            tv.setId(ex.getId());
+            tv.setOnClickListener(addRemoveExerciseListener(tv));
 
+            ImageView trash = new ImageView(this);
+            trash.setBackgroundResource(R.drawable.trash);
+            ll.addView(tv);
+            ll.addView(trash);
+            exerciseList.addView(ll);
+        }
     }
-
-
 }
