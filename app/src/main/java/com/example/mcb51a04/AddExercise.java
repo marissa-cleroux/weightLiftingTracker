@@ -3,17 +3,14 @@ package com.example.mcb51a04;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class AddExercise extends AppCompatActivity {
@@ -43,7 +40,7 @@ public class AddExercise extends AppCompatActivity {
             public void onClick(View view) {
                 if(addNewExercise()){
                     ToastMessage("Exercise successfully added!");
-                    ReturnToMainMenu();
+                    sendToManageExercises();
                 }else {
                     ToastMessage("Exercise was not added, review the details and try again.");
                 }
@@ -53,12 +50,66 @@ public class AddExercise extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
-    private void ReturnToMainMenu() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.action_home){
+            returnToMainMenu();
+        } else if (id == R.id.action_about) {
+            sendToAbout();
+        } else if (id == R.id.action_help) {
+            sendToHelp();
+        } else if (id == R.id.action_exercises) {
+            sendToManageExercises();
+        } else if (id == R.id.action_history) {
+            sendToHistory();
+        } else if (id == R.id.action_workout) {
+            sendToWorkout();
+        } else if (id == R.id.action_workouts) {
+            sendToManageWorkouts();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void returnToMainMenu() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToHelp() {
+        Intent i = new Intent(this, Help.class);
+        startActivity(i);
+    }
+
+    private void sendToAbout() {
+        Intent i = new Intent(this, About.class);
+        startActivity(i);
+    }
+
+    public void sendToManageExercises(){
         Intent i = new Intent(this, ManageExercises.class);
+        startActivity(i);
+    }
+
+    public void sendToManageWorkouts() {
+        Intent i = new Intent(this, ManageWorkouts.class);
+        startActivity(i);
+    }
+
+    private void sendToHistory() {
+        Intent i = new Intent(this, HistoryActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToWorkout() {
+        Intent i = new Intent(this, PickWorkout.class);
         startActivity(i);
     }
 

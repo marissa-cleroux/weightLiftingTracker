@@ -12,60 +12,17 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+public class Help extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_help);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Button btnMngExercises = findViewById(R.id.btnMngExercises);
-        btnMngExercises.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendToManageExercises();
-            }
-        });
-
-        Button btnMngWorkouts = findViewById(R.id.btnMngWorkouts);
-        btnMngWorkouts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendToManageWorkouts();
-            }
-        });
-
-        Button btnWorkout = findViewById(R.id.btnWorkout);
-        btnWorkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendToWorkout();
-            }
-        });
-
-        Button btnHistory = findViewById(R.id.btnHistory);
-        btnHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendToHistory();
-            }
-        });
-
     }
 
-    private void sendToHistory() {
-        Intent i = new Intent(this, HistoryActivity.class);
-        startActivity(i);
-    }
-
-    private void sendToWorkout() {
-        Intent i = new Intent(this, PickWorkout.class);
-        startActivity(i);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -97,13 +54,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void sendToHelp() {
-        Intent i = new Intent(this, Help.class);
+    private void returnToMainMenu() {
+        Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
     }
 
-    private void returnToMainMenu() {
-        Intent i = new Intent(this, MainActivity.class);
+    private void sendToHelp() {
+        Intent i = new Intent(this, Help.class);
         startActivity(i);
     }
 
@@ -122,4 +79,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(i);
     }
 
+    private void sendToHistory() {
+        Intent i = new Intent(this, HistoryActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToWorkout() {
+        Intent i = new Intent(this, PickWorkout.class);
+        startActivity(i);
+    }
 }

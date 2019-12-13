@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -77,7 +78,7 @@ public class ManageExercises extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                exerciseToDelete = null;
+
             }
         });
 
@@ -106,8 +107,65 @@ public class ManageExercises extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.action_home){
+            returnToMainMenu();
+        } else if (id == R.id.action_about) {
+            sendToAbout();
+        } else if (id == R.id.action_help) {
+            sendToHelp();
+        } else if (id == R.id.action_exercises) {
+            sendToManageExercises();
+        } else if (id == R.id.action_history) {
+            sendToHistory();
+        } else if (id == R.id.action_workout) {
+            sendToWorkout();
+        } else if (id == R.id.action_workouts) {
+            sendToManageWorkouts();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void sendToHelp() {
+        Intent i = new Intent(this, Help.class);
+        startActivity(i);
+    }
+
+    private void returnToMainMenu() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToAbout() {
+        Intent i = new Intent(this, About.class);
+        startActivity(i);
+    }
+
+    public void sendToManageExercises(){
+        Intent i = new Intent(this, ManageExercises.class);
+        startActivity(i);
+    }
+
+    public void sendToManageWorkouts() {
+        Intent i = new Intent(this, ManageWorkouts.class);
+        startActivity(i);
+    }
+
+    private void sendToHistory() {
+        Intent i = new Intent(this, HistoryActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToWorkout() {
+        Intent i = new Intent(this, PickWorkout.class);
+        startActivity(i);
+    }
+
     private void deleteExercise() {
-        //TODO: Add popup
         if (exerciseToDelete == null) {
             ToastMessage("You must select an exercise to delete!");
             return;
@@ -155,7 +213,7 @@ public class ManageExercises extends AppCompatActivity {
     private void loadSpinners() {
         ArrayList<String> exercises = getAllExercises();
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, exercises);
+                R.layout.simple_spinner_item, exercises);
 
         exercises.add(0, "--Select One--");
         ddEdits.setAdapter(dataAdapter);

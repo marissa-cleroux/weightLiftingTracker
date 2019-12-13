@@ -10,19 +10,34 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".PerformWorkout"
-            android:label="@string/title_activity_perform_workout"
+            android:name=".Help"
+            android:label="@string/title_activity_help"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".About"
+            android:label="@string/title_activity_about"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".HistoryActivity"
+            android:label="@string/title_activity_history"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PerformWorkout"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_perform_workout"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PickWorkout"
             android:label="@string/title_activity_pick_workout"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditWorkout"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_edit_workout"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddWorkout"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_add_workout"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -31,10 +46,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditExercise"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_edit_exercise"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".AddExercise"
+            android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_add_exercise"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

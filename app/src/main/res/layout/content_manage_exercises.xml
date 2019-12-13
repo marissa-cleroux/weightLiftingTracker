@@ -93,7 +93,8 @@
                 android:layout_marginBottom="15dp"
                 android:gravity="center_horizontal"
                 android:text="@string/delete"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                />
         </TableRow>
 
     </TableLayout>

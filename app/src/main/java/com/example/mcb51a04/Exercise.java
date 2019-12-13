@@ -9,6 +9,7 @@ public class Exercise extends NamedObject implements Serializable {
     private int reps;
     private double weight;
     private double increment;
+    private int[] currentReps;
 
     public Exercise(int id, String name, int sets, int reps, double weight, double increment) {
         super(name);
@@ -17,6 +18,7 @@ public class Exercise extends NamedObject implements Serializable {
         this.reps = reps;
         this.weight = weight;
         this.increment = increment;
+        setCurrentReps();
     }
 
     public Exercise() {
@@ -40,16 +42,8 @@ public class Exercise extends NamedObject implements Serializable {
         return sets;
     }
 
-    public void setSets(int sets) {
-        this.sets = sets;
-    }
-
     public int getReps() {
         return reps;
-    }
-
-    public void setReps(int reps) {
-        this.reps = reps;
     }
 
     public double getWeight() {
@@ -66,6 +60,23 @@ public class Exercise extends NamedObject implements Serializable {
 
     public void setIncrement(double increment) {
         this.increment = increment;
+    }
+
+
+    private void setCurrentReps() {
+        currentReps = new int[sets];
+
+        for(int i = 0; i < sets; i++){
+            currentReps[i] = reps;
+        }
+    }
+
+    public void setCurrentReps(int set, int reps){
+        currentReps[set] = reps;
+    }
+
+    public int[] getCurrentReps() {
+        return currentReps;
     }
 
     @Override

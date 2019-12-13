@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.Parcelable;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,6 +65,64 @@ public class EditExercise extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.action_home){
+            returnToMainMenu();
+        } else if (id == R.id.action_about) {
+            sendToAbout();
+        } else if (id == R.id.action_help) {
+            sendToHelp();
+        } else if (id == R.id.action_exercises) {
+            sendToManageExercises();
+        } else if (id == R.id.action_history) {
+            sendToHistory();
+        } else if (id == R.id.action_workout) {
+            sendToWorkout();
+        } else if (id == R.id.action_workouts) {
+            sendToManageWorkouts();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void returnToMainMenu() {
+        Intent i = new Intent(this, MainActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToHelp() {
+        Intent i = new Intent(this, Help.class);
+        startActivity(i);
+    }
+
+    private void sendToAbout() {
+        Intent i = new Intent(this, About.class);
+        startActivity(i);
+    }
+
+    public void sendToManageExercises(){
+        Intent i = new Intent(this, ManageExercises.class);
+        startActivity(i);
+    }
+
+    public void sendToManageWorkouts() {
+        Intent i = new Intent(this, ManageWorkouts.class);
+        startActivity(i);
+    }
+
+    private void sendToHistory() {
+        Intent i = new Intent(this, HistoryActivity.class);
+        startActivity(i);
+    }
+
+    private void sendToWorkout() {
+        Intent i = new Intent(this, PickWorkout.class);
+        startActivity(i);
     }
 
     private void setFields() {

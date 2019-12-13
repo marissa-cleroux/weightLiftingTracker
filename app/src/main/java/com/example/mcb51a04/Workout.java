@@ -49,13 +49,18 @@ public class Workout extends NamedObject implements Serializable {
     }
 
     public boolean removeExercise(int id){
-        Exercise exercise = null;
+        Exercise exercise = getExercise(id);
+
+        return (exercise != null) ? exercises.remove(exercise) : false;
+    }
+
+    public Exercise getExercise(int id){
         for(Exercise ex : exercises){
             if(ex.getId() == id){
-                exercise = ex;
+                return ex;
             }
         }
 
-        return (exercise != null) ? exercises.remove(exercise) : false;
+        return null;
     }
 }

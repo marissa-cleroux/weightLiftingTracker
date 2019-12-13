@@ -6,7 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class DbHandler extends SQLiteOpenHelper {
 
@@ -33,11 +36,11 @@ public class DbHandler extends SQLiteOpenHelper {
     private static final String EXERCISE_HISTORY_TABLE_NAME = "exercise_history";
     private static final String EXERCISE_HISTORY_COLUMN_ID = "id";
     private static final String EXERCISE_HISTORY_EXERCISE_COLUMN_ID = "exercise_id";
-    private static final String EXERCISE_HISTORY_COLUMN_SETS = "sets";
-    private static final String EXERCISE_HISTORY_COLUMN_REPS = "reps";
+//    private static final String EXERCISE_HISTORY_COLUMN_SETS = "sets";
+//    private static final String EXERCISE_HISTORY_COLUMN_REPS = "reps";
     private static final String EXERCISE_HISTORY_COLUMN_WEIGHT = "weight";
-    private static final String EXERCISE_HISTORY_COLUMN_TARGET_SETS = "target_sets";
-    private static final String EXERCISE_HISTORY_COLUMN_TARGET_REPS = "target_reps";
+//    private static final String EXERCISE_HISTORY_COLUMN_TARGET_SETS = "target_sets";
+//    private static final String EXERCISE_HISTORY_COLUMN_TARGET_REPS = "target_reps";
     private static final String EXERCISE_HISTORY_COLUMN_DATE = "date_completed";
 
     public DbHandler(Context context) {
@@ -73,11 +76,7 @@ public class DbHandler extends SQLiteOpenHelper {
         db.execSQL(
                 "create table " + EXERCISE_HISTORY_TABLE_NAME +
                         " (" + EXERCISE_HISTORY_COLUMN_ID + " integer primary key, " +
-                        EXERCISE_HISTORY_COLUMN_SETS + " integer, " +
-                        EXERCISE_HISTORY_COLUMN_REPS + " integer, " +
                         EXERCISE_HISTORY_COLUMN_WEIGHT + " integer, " +
-                        EXERCISE_HISTORY_COLUMN_TARGET_SETS + " double, " +
-                        EXERCISE_HISTORY_COLUMN_TARGET_REPS + " double, " +
                         EXERCISE_HISTORY_COLUMN_DATE + " date, " +
                         EXERCISE_HISTORY_EXERCISE_COLUMN_ID + " integer, " +
                         " foreign key (" + EXERCISE_HISTORY_EXERCISE_COLUMN_ID + ") REFERENCES " +
@@ -145,6 +144,15 @@ public class DbHandler extends SQLiteOpenHelper {
         contentValues.put(EXERCISES_COLUMN_NAME, name);
         contentValues.put(EXERCISES_COLUMN_SETS, sets);
         contentValues.put(EXERCISES_COLUMN_REPS, reps);
+        contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
+
+        return db.update(EXERCISES_TABLE_NAME, contentValues, EXERCISES_COLUMN_ID + " = ?",  new String[] { Integer.toString(id) } );
+    }
+
+    public long incrementExercise (int id, double weight)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
         contentValues.put(EXERCISES_COLUMN_WEIGHT, weight);
 
         return db.update(EXERCISES_TABLE_NAME, contentValues, EXERCISES_COLUMN_ID + " = ?",  new String[] { Integer.toString(id) } );
@@ -253,5 +261,40 @@ public class DbHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long res = db.delete(WORKOUTS_TABLE_NAME, WORKOUTS_COLUMN_ID + " = ?", new String[]{Integer.toString(id)});
         return res != -1;
+    }
+
+    public long saveHistory(Exercise exercise) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(EXERCISE_HISTORY_COLUMN_DATE, dateFormat.format(new Date()));
+        contentValues.put(EXERCISE_HISTORY_COLUMN_WEIGHT, exercise.getWeight());
+        contentValues.put(EXERCISE_HISTORY_EXERCISE_COLUMN_ID, exercise.getId());
+
+        return db.insert(EXERCISE_HISTORY_TABLE_NAME, null, contentValues);
+    }
+
+    public ArrayList<ExerciseHistory> getExerciseHistory(int id){
+        ArrayList<ExerciseHistory> history = new ArrayList<>();
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select " + EXERCISES_COLUMN_NAME + " , h." + EXERCISE_HISTORY_COLUMN_WEIGHT + ", " + EXERCISE_HISTORY_COLUMN_DATE +
+                " from " + EXERCISES_TABLE_NAME +  " as e join " + EXERCISE_HISTORY_TABLE_NAME + " as h on e." +
+                EXERCISES_COLUMN_ID + " = h." + EXERCISE_HISTORY_EXERCISE_COLUMN_ID +
+                " where e." + EXERCISES_COLUMN_ID + " = ? ORDER BY date(" + EXERCISE_HISTORY_COLUMN_DATE + ") DESC", new String[]{Integer.toString(id)});
+
+        res.moveToFirst();
+        while (!res.isAfterLast()) {
+            String name = res.getString(res.getColumnIndex(EXERCISES_COLUMN_NAME));
+            double weight = res.getDouble(res.getColumnIndex(EXERCISE_HISTORY_COLUMN_WEIGHT));
+            String date = res.getString(res.getColumnIndex(EXERCISE_HISTORY_COLUMN_DATE));
+            ExerciseHistory exercise = new ExerciseHistory(name, weight, date);
+            history.add(exercise);
+            res.moveToNext();
+        }
+        res.close();
+
+        return history;
     }
 }
